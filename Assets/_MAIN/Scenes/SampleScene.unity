@@ -1250,12 +1250,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4348119137522889819, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
+      propertyPath: gizmoOffset
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348119137522889819, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
+      propertyPath: gizmoRadius
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4348119137522889819, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
+      propertyPath: gizmoOffset.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8675837503973166840, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4746938394765674961, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
