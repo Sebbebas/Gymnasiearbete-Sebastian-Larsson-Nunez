@@ -404,4 +404,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   lastDirection: 0
+  preFireInputDirection: 0
   movementSpeed: 5
+  preFireMoveTime: 1
+  gizmoLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  gizmoOffset: 0
+  gizmoRadius: 0

@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,23 +8,33 @@ public enum MovementDirection
 
 public class PlayerMovement : MonoBehaviour
 {
-    //Configurable Parameters
+    // Configurable Parameters \\
     [Header("Input")]
     [SerializeField] InputActionAsset inputActions;
-    [SerializeField] MovementDirection lastDirection;
 
     [Header("Movement")]
-    [SerializeField] float movementSpeed = 1.0f;
+    [SerializeField, Tooltip("Sebbe va gör movementSpeed? -Viggo")] float movementSpeed = 1.0f;
+    [SerializeField, Tooltip("The time it takes for a new Input to be canceld")] float preFireMoveTime = 1.0f;
 
     [Header("Gizmos")]
     [SerializeField] LayerMask gizmoLayerMask;
     [SerializeField] float gizmoOffset;
     [SerializeField] float gizmoRadius;
 
-    //Private Variables
-    private Vector3 lastInput;
+    // Private Variables \\
 
-    //Cached References
+    //Direction
+    private MovementDirection lastDirection;
+    private MovementDirection preFireInputDirection;
+
+    private Vector2 latestPreformedMoveDirection;
+    private Vector2 currentPreFireDirection;
+    private Vector2 currentMoveDirection;
+
+    private float currentPreFireInputTime;
+    private bool moveReset = true;
+
+    // Cached References \\
     InputAction movementAction;
     Rigidbody2D myrigidbody;
     BoxCollider2D playerCollider;
@@ -35,30 +44,44 @@ public class PlayerMovement : MonoBehaviour
         myrigidbody = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<BoxCollider2D>();
     }
-
-    private void Update()
+    private void FixedUpdate()
     {
-        Vector2 moveDirection = Vector2.zero;
-
-        switch (lastDirection)
+        if(moveReset == true)
         {
-            case MovementDirection.up:
-                moveDirection = Vector2.up;
-                break;
-            case MovementDirection.right:
-                moveDirection = Vector2.right;
-                break;
-            case MovementDirection.down:
-                moveDirection = Vector2.down;
-                break;
-            case MovementDirection.left:
-                moveDirection = Vector2.left;
-                break;
+            if (preFireInputDirection != MovementDirection.none)
+            {
+                currentMoveDirection = currentPreFireDirection;
+                ResetDirections();
+            }
+            else if (lastDirection != MovementDirection.none)
+            {
+                currentMoveDirection = latestPreformedMoveDirection;
+                ResetDirections();
+            }
         }
 
-        myrigidbody.linearVelocity = moveDirection * movementSpeed;
+        myrigidbody.linearVelocity = currentMoveDirection * movementSpeed;
+
+        //Input
+        if (Physics2D.OverlapCircle((Vector2)transform.position + (currentMoveDirection * gizmoOffset), gizmoRadius, gizmoLayerMask)) { moveReset = true; }
+        if (currentPreFireInputTime > 0) { currentPreFireInputTime -= Time.deltaTime; if (currentPreFireInputTime <= 0) { currentPreFireInputTime = 0; currentPreFireDirection = Vector2.zero; preFireInputDirection = MovementDirection.none; } }
     }
 
+    private void ResetDirections()
+    {
+        //Reset PreFire Direction
+        preFireInputDirection = MovementDirection.none;
+        currentPreFireDirection = Vector2.zero;
+
+        //Reset Last Direction
+        lastDirection = MovementDirection.none;
+        latestPreformedMoveDirection = Vector2.zero;
+
+        //Cant change Direction Again
+        moveReset = false;
+    }
+
+    #region Get Inputs
     private void OnEnable()
     {
         var actionMap = inputActions.FindActionMap("Player");
@@ -66,74 +89,58 @@ public class PlayerMovement : MonoBehaviour
         movementAction.Enable();
         movementAction.performed += OnMove;
     }
-
     private void OnDisable()
     {
         movementAction.performed -= OnMove;
     }
-
+    #endregion
+    
     public void OnMove(InputAction.CallbackContext context)
     {
-        Vector2 overlapDirection = Vector2.zero;
-
-        switch (lastDirection)
-        {
-            case MovementDirection.up:
-                overlapDirection = Vector2.up;
-                break;
-            case MovementDirection.right:
-                overlapDirection = Vector2.right;
-                break;
-            case MovementDirection.down:
-                overlapDirection = Vector2.down;
-                break;
-            case MovementDirection.left:
-                overlapDirection = Vector2.left;
-                break;
-        }
-
-        if (Physics2D.OverlapCircle((Vector2)transform.position + (overlapDirection * gizmoOffset), gizmoRadius, gizmoLayerMask)) { return; }
-
         Vector2 direction = context.ReadValue<Vector2>();
         direction.x = Mathf.RoundToInt(direction.x);
         direction.y = Mathf.RoundToInt(direction.y);
 
-        if (direction.x != 0 && lastInput.x != direction.x)
+        if (moveReset == false)
         {
-            if (direction.x > 0) { lastDirection = MovementDirection.right; }
-            else { lastDirection = MovementDirection.left; }
+            PreFire(direction);
+            return;
         }
-
-        if (direction.y != 0 && lastInput.y != direction.y)
+        else
         {
-            if (direction.y > 0) { lastDirection = MovementDirection.up; }
-            else { lastDirection = MovementDirection.down; }
+            if (direction.x != 0 && latestPreformedMoveDirection.x != direction.x) { lastDirection = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
+            if (direction.y != 0 && latestPreformedMoveDirection.y != direction.y) { lastDirection = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
+            latestPreformedMoveDirection = direction;
         }
+    }
+    public void PreFire(Vector3 direction)
+    {
+        if (direction.x != 0 && currentPreFireDirection.x != direction.x) { preFireInputDirection = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
+        if (direction.y != 0 && currentPreFireDirection.y != direction.y) { preFireInputDirection = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
+        currentPreFireDirection = direction;
 
-        lastInput = direction;
+        currentPreFireInputTime = preFireMoveTime;
     }
 
-    public void OnDrawGizmosSelected()
+    private Vector2 GetDirectionVector(MovementDirection direction)
     {
-        Vector2 gizmoDirection = Vector2.zero;
-
-        switch (lastDirection)
+        switch (direction)
         {
             case MovementDirection.up:
-                gizmoDirection = Vector2.up;
-                break;
+                return Vector2.up;
             case MovementDirection.right:
-                gizmoDirection = Vector2.right;
-                break;
+                return Vector2.right;
             case MovementDirection.down:
-                gizmoDirection = Vector2.down;
-                break;
+                return Vector2.down;
             case MovementDirection.left:
-                gizmoDirection = Vector2.left;
-                break;
+                return Vector2.left;
+            default:
+                return Vector2.zero;
         }
-
+    }
+    public void OnDrawGizmosSelected()
+    {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere((Vector2)transform.position + (gizmoDirection * gizmoOffset), gizmoRadius);
+        Gizmos.DrawWireSphere((Vector2)transform.position + (currentMoveDirection * gizmoOffset), gizmoRadius);
     }
 }
