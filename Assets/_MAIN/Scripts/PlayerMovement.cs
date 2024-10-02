@@ -22,17 +22,19 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float gizmoRadius;
 
     // Private Variables \\
-
-    //Direction
-    private MovementDirection lastDirection;
-    private MovementDirection preFireInputDirection;
-
-    private Vector2 latestPreformedMoveDirection;
-    private Vector2 currentPreFireDirection;
-    private Vector2 currentMoveDirection;
-
     private float currentPreFireInputTime;
     private bool moveReset = true;
+
+    //Direction enums
+    [SerializeField] private MovementDirection directionOfInput;
+    [SerializeField] private MovementDirection lastPreformed;
+    [SerializeField] private MovementDirection preFireInputDirection;
+
+    //Direction Vector
+    private Vector2 latestPreformedMoveDirection;
+    private Vector2 currentPreFireDirection;
+
+    private Vector2 currentMoveDirection;
 
     // Cached References \\
     InputAction movementAction;
@@ -41,30 +43,47 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        //Get Cached References
         myrigidbody = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<BoxCollider2D>();
     }
     private void FixedUpdate()
     {
+        //can move?
         if(moveReset == true)
         {
+            //Move in the same direction as the last "Prefire Input"
             if (preFireInputDirection != MovementDirection.none)
             {
                 currentMoveDirection = currentPreFireDirection;
                 ResetDirections();
             }
-            else if (lastDirection != MovementDirection.none)
+
+            //Move in the same direction as the last "Input"
+            else if (directionOfInput != MovementDirection.none)
             {
                 currentMoveDirection = latestPreformedMoveDirection;
                 ResetDirections();
             }
         }
 
+        //Move the player in the current direction 
         myrigidbody.linearVelocity = currentMoveDirection * movementSpeed;
 
-        //Input
+        //Reset move when OverlapCircle collides with wall
         if (Physics2D.OverlapCircle((Vector2)transform.position + (currentMoveDirection * gizmoOffset), gizmoRadius, gizmoLayerMask)) { moveReset = true; }
-        if (currentPreFireInputTime > 0) { currentPreFireInputTime -= Time.deltaTime; if (currentPreFireInputTime <= 0) { currentPreFireInputTime = 0; currentPreFireDirection = Vector2.zero; preFireInputDirection = MovementDirection.none; } }
+
+        //reduce the currentPreFireInputTime with Time.deltaTime if its greater then 0
+        if (currentPreFireInputTime > 0) 
+        { 
+            currentPreFireInputTime -= Time.deltaTime;
+
+            //When the currentPreFireInputTime reaches 0 reset the currentPreFireDirection
+            if (currentPreFireInputTime <= 0) 
+            { 
+                currentPreFireInputTime = 0; currentPreFireDirection = Vector2.zero; preFireInputDirection = MovementDirection.none; 
+            } 
+        }
     }
 
     private void ResetDirections()
@@ -74,42 +93,58 @@ public class PlayerMovement : MonoBehaviour
         currentPreFireDirection = Vector2.zero;
 
         //Reset Last Direction
-        lastDirection = MovementDirection.none;
+        directionOfInput = MovementDirection.none;
         latestPreformedMoveDirection = Vector2.zero;
 
-        //Cant change Direction Again
+        //Cant change move direction 
         moveReset = false;
     }
 
     #region Get Inputs
     private void OnEnable()
     {
+        //Create a actionMap and Find "Player"
         var actionMap = inputActions.FindActionMap("Player");
+        
+        //Find "Move" action in "Player"
         movementAction = actionMap.FindAction("Move");
+        
+        //Enable Action
         movementAction.Enable();
+
+        //Subscribe to the performed action
         movementAction.performed += OnMove;
     }
     private void OnDisable()
     {
+        //Unsubscribe to the performed action
         movementAction.performed -= OnMove;
     }
     #endregion
     
+    /// <summary>
+    /// When OnMove is called Get the <paramref name="context"/> of the input and do stuff
+    /// </summary>
     public void OnMove(InputAction.CallbackContext context)
     {
+        //Get Input direction Context in Vector2 form
         Vector2 direction = context.ReadValue<Vector2>();
+
+        //Round the Input direction to closest Int (From ±0.72 to 1)
         direction.x = Mathf.RoundToInt(direction.x);
         direction.y = Mathf.RoundToInt(direction.y);
 
+        //If the player dose not touch a wall set a new Prefire direction
         if (moveReset == false)
         {
             PreFire(direction);
             return;
         }
+        //Else <--------------- CONTINUE HERE 
         else
         {
-            if (direction.x != 0 && latestPreformedMoveDirection.x != direction.x) { lastDirection = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
-            if (direction.y != 0 && latestPreformedMoveDirection.y != direction.y) { lastDirection = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
+            if (direction.x != 0 && latestPreformedMoveDirection.x != direction.x) { this.directionOfInput = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
+            if (direction.y != 0 && latestPreformedMoveDirection.y != direction.y) { this.directionOfInput = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
             latestPreformedMoveDirection = direction;
         }
     }
