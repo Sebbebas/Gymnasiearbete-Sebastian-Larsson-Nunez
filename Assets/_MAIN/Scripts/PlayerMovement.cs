@@ -25,16 +25,17 @@ public class PlayerMovement : MonoBehaviour
     private float currentPreFireInputTime;
     private bool moveReset = true;
 
-    //Direction enums
-    [SerializeField] private MovementDirection directionOfInput;
-    [SerializeField] private MovementDirection lastPreformed;
-    [SerializeField] private MovementDirection preFireInputDirection;
-
-    //Direction Vector
-    private Vector2 latestPreformedMoveDirection;
-    private Vector2 currentPreFireDirection;
-
+    //Direction
     private Vector2 currentMoveDirection;
+
+    [SerializeField] private MovementDirection directionOfInput;
+    private Vector2 directionOfInputVector2;
+    
+    [SerializeField] private MovementDirection lastPreformedInput;
+    private Vector2 lastPreformedInputVector2;
+    
+    [SerializeField] private MovementDirection preFireDirection;
+    private Vector2 preFireDirectionVector2;
 
     // Cached References \\
     InputAction movementAction;
@@ -53,16 +54,16 @@ public class PlayerMovement : MonoBehaviour
         if(moveReset == true)
         {
             //Move in the same direction as the last "Prefire Input"
-            if (preFireInputDirection != MovementDirection.none)
+            if (preFireDirection != MovementDirection.none)
             {
-                currentMoveDirection = currentPreFireDirection;
+                currentMoveDirection = preFireDirectionVector2;
                 ResetDirections();
             }
 
             //Move in the same direction as the last "Input"
             else if (directionOfInput != MovementDirection.none)
             {
-                currentMoveDirection = latestPreformedMoveDirection;
+                currentMoveDirection = directionOfInputVector2;
                 ResetDirections();
             }
         }
@@ -78,23 +79,23 @@ public class PlayerMovement : MonoBehaviour
         { 
             currentPreFireInputTime -= Time.deltaTime;
 
-            //When the currentPreFireInputTime reaches 0 reset the currentPreFireDirection
+            //When the currentPreFireInputTime reaches 0 reset the preFireDirectionVector2
             if (currentPreFireInputTime <= 0) 
             { 
-                currentPreFireInputTime = 0; currentPreFireDirection = Vector2.zero; preFireInputDirection = MovementDirection.none; 
+                currentPreFireInputTime = 0; preFireDirectionVector2 = Vector2.zero; preFireDirection = MovementDirection.none; 
             } 
         }
     }
 
     private void ResetDirections()
     {
-        //Reset PreFire Direction
-        preFireInputDirection = MovementDirection.none;
-        currentPreFireDirection = Vector2.zero;
+        //Reset SetPreFireDirection Direction
+        preFireDirection = MovementDirection.none;
+        preFireDirectionVector2 = Vector2.zero;
 
         //Reset Last Direction
         directionOfInput = MovementDirection.none;
-        latestPreformedMoveDirection = Vector2.zero;
+        directionOfInputVector2 = Vector2.zero;
 
         //Cant change move direction 
         moveReset = false;
@@ -137,26 +138,59 @@ public class PlayerMovement : MonoBehaviour
         //If the player dose not touch a wall set a new Prefire direction
         if (moveReset == false)
         {
-            PreFire(direction);
+            SetPreFireDirection(direction);
             return;
         }
-        //Else <--------------- CONTINUE HERE 
+
+        //Else set the "directionOfInputVector2" based on "lastPreformedInput"
         else
         {
-            if (direction.x != 0 && latestPreformedMoveDirection.x != direction.x) { this.directionOfInput = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
-            if (direction.y != 0 && latestPreformedMoveDirection.y != direction.y) { this.directionOfInput = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
-            latestPreformedMoveDirection = direction;
+            SetMoveDirection(direction);
+            return;
         }
     }
-    public void PreFire(Vector3 direction)
+    public void SetMoveDirection(Vector2 direction)
     {
-        if (direction.x != 0 && currentPreFireDirection.x != direction.x) { preFireInputDirection = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
-        if (direction.y != 0 && currentPreFireDirection.y != direction.y) { preFireInputDirection = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
-        currentPreFireDirection = direction;
+        //Based on the "lastPreformedInput" update directionOfInput
+        if (direction.x != 0 && lastPreformedInputVector2.x != direction.x) { directionOfInput = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
+        if (direction.y != 0 && lastPreformedInputVector2.y != direction.y) { directionOfInput = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
 
-        currentPreFireInputTime = preFireMoveTime;
+        //Set the direction
+        directionOfInputVector2 = direction;
+
+        //Update last performed
+        lastPreformedInputVector2 = direction;
     }
 
+    public void SetPreFireDirection(Vector2 direction)
+    {
+        //Based on the "lastPreformedInput" update "preFireDirection"
+        if (direction.x != 0 && preFireDirectionVector2.x != direction.x) { preFireDirection = (direction.x > 0) ? MovementDirection.right : MovementDirection.left; }
+        if (direction.y != 0 && preFireDirectionVector2.y != direction.y) { preFireDirection = (direction.y > 0) ? MovementDirection.up : MovementDirection.down; }
+
+        //Set the time before the prefire expires
+        currentPreFireInputTime = preFireMoveTime;
+
+        //Set the preFireDirection
+        preFireDirectionVector2 = direction;
+
+        //Update last performed
+        lastPreformedInputVector2 = direction;
+        
+    }
+    private MovementDirection GetMovementDirection(Vector2 direction)
+    {
+        if (direction == Vector2.up)
+            return MovementDirection.up;
+        else if (direction == Vector2.right)
+            return MovementDirection.right;
+        else if (direction == Vector2.down)
+            return MovementDirection.down;
+        else if (direction == Vector2.left)
+            return MovementDirection.left;
+        else
+            return MovementDirection.none;
+    }
     private Vector2 GetDirectionVector(MovementDirection direction)
     {
         switch (direction)
