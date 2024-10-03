@@ -1169,8 +1169,8 @@ MonoBehaviour:
   gizmoOffset: 0.37
   gizmoRadius: 0.18
   directionOfInput: 0
-  lastPreformed: 0
-  preFireInputDirection: 0
+  lastPreformedInput: 0
+  preFireDirection: 0
 --- !u!114 &590271337409437866
 MonoBehaviour:
   m_ObjectHideFlags: 0
