@@ -3134,6 +3134,33 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!1 &1314672736 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8422994635801189318, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
+  m_PrefabInstance: {fileID: 6526981641123044766}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1314672739
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1314672736}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bdc83c815c3fb8f44aa22705631fe36a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1403999832
 GameObject:
   m_ObjectHideFlags: 0
@@ -3244,10 +3271,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 819357160162823714, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3142090676990080911, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
       propertyPath: m_Interpolate
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3204625755141397767, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 7364682651488144517, guid: 51c81e11cf1b83741a6d4debdf26562c, type: 3}
     - target: {fileID: 3365455070499437045, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
       propertyPath: m_Size.x
       value: 1
@@ -3339,6 +3374,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8675837503973166840, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
       insertIndex: 4
       addedObject: {fileID: 6526981641123044773}
+    - targetCorrespondingSourceObject: {fileID: 8422994635801189318, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1314672739}
   m_SourcePrefab: {fileID: 100100000, guid: 8f7e95e8a39481d4dae2f3e4b93e6ec3, type: 3}
 --- !u!114 &6526981641123044767 stripped
 MonoBehaviour:

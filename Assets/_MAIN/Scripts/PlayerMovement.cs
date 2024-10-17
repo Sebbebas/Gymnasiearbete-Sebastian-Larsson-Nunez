@@ -238,4 +238,8 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(transform.position, new Vector3(1, 1, 1));
     }
+    public Vector2 GetCurrentMoveDirecion()
+    {
+        return currentMoveDirection;
+    }
 }
