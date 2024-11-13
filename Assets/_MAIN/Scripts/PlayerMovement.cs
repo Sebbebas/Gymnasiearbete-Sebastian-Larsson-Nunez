@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Current pressed Input
     private MovementDirection directionOfInput;
-    private Vector2 directionOfInputVector2;
+    private Vector2 directionOfInputVector2; 
 
     //Last performed Input
     private MovementDirection lastPreformedInput;

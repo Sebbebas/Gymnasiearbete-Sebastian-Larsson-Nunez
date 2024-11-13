@@ -7,10 +7,6 @@ public class PointManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI pointHUD;
     [SerializeField] int totalPoints;
 
-    //Private Variables
-
-    //Cached References
-
     void Start()
     {
         totalPoints = 0;
@@ -24,5 +20,9 @@ public class PointManager : MonoBehaviour
             pointHUD.text = totalPoints.ToString() +"p";
             Destroy(collision.gameObject);
         }
+    }
+    public int GetPoints()
+    {
+        return totalPoints;
     }
 }
