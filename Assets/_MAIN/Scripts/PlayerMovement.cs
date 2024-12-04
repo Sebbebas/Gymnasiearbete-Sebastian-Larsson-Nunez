@@ -29,15 +29,15 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 currentMoveDirection;
 
     //Current pressed Input
-    private MovementDirection directionOfInput;
-    private Vector2 directionOfInputVector2; 
+    [SerializeField] private MovementDirection directionOfInput;
+    private Vector2 directionOfInputVector2;
 
     //Last performed Input
-    private MovementDirection lastPreformedInput;
+    [SerializeField] private MovementDirection lastPreformedInput;
     private Vector2 lastPreformedInputVector2;
 
     //Current "preFireInput"
-    private MovementDirection preFireDirection;
+    [SerializeField] private MovementDirection preFireDirection;
     private Vector2 preFireDirectionVector2;
 
     // Cached References \\
@@ -238,8 +238,13 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(transform.position, new Vector3(1, 1, 1));
     }
-    public Vector2 GetCurrentMoveDirecion()
+
+    public MovementDirection GetlastPreformedInput()
     {
-        return currentMoveDirection;
+        return lastPreformedInput;
+    }
+    public Vector2 GetlastPreformedVector2()
+    {
+        return lastPreformedInputVector2;
     }
 }
